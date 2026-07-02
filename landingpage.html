@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBStore — Shop Everything Near You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:   #0B1120;
+    --navy2:  #111827;
+    --amber:  #F59E0B;
+    --amber2: #D97706;
+    --pearl:  #F8F6F1;
+    --slate:  #94A3B8;
+    --green:  #10B981;
+    --card:   #141E2E;
+    --border: rgba(245,158,11,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--navy);
+    color: var(--pearl);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 5%;
+    background: rgba(11,17,32,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--amber); letter-spacing: -0.02em;
+  }
+  .nav-logo span { color: var(--pearl); }
+  .nav-links { display: flex; align-items: center; gap: 2rem; }
+  .nav-links a {
+    color: var(--slate); text-decoration: none; font-size: 0.9rem;
+    font-weight: 500; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--pearl); }
+  .nav-cta {
+    background: var(--amber); color: var(--navy) !important;
+    padding: 0.55rem 1.25rem; border-radius: 6px;
+    font-weight: 700 !important; font-size: 0.85rem !important;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--amber2) !important; color: var(--navy) !important; }
+  .nav-mobile-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav-mobile-btn span { display: block; width: 22px; height: 2px; background: var(--pearl); margin: 4px 0; border-radius: 2px; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding-top: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 20% 50%, rgba(245,158,11,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 5% 5% 5% 7%;
+    position: relative; z-index: 2;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--amber);
+    margin-bottom: 1.5rem;
+  }
+  .hero-eyebrow::before {
+    content: ''; width: 28px; height: 2px; background: var(--amber);
+  }
+  .hero-h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    font-weight: 900; line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+  .hero-h1 em {
+    font-style: italic; color: var(--amber);
+    display: block;
+  }
+  .hero-sub {
+    font-size: 1.05rem; line-height: 1.7;
+    color: var(--slate); max-width: 440px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-actions { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--amber); color: var(--navy);
+    padding: 0.9rem 2rem; border-radius: 8px;
+    font-weight: 700; font-size: 0.95rem;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--amber2); transform: translateY(-1px); }
+  .btn-secondary {
+    color: var(--pearl); background: transparent;
+    border: 1px solid rgba(248,246,241,0.2);
+    padding: 0.9rem 2rem; border-radius: 8px;
+    font-weight: 600; font-size: 0.95rem;
+    text-decoration: none; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: var(--amber); background: rgba(245,158,11,0.06); }
+  .hero-stats {
+    display: flex; gap: 2.5rem; margin-top: 3rem;
+    padding-top: 2rem; border-top: 1px solid var(--border);
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem; font-weight: 700; color: var(--pearl);
+    line-height: 1;
+  }
+  .stat-label { font-size: 0.78rem; color: var(--slate); margin-top: 4px; }
+
+  /* ── VENDOR CARD STACK ── */
+  .hero-right {
+    display: flex; align-items: center; justify-content: center;
+    padding: 5%; position: relative;
+  }
+  .card-stack {
+    position: relative; width: 320px; height: 420px;
+  }
+  .vendor-card {
+    position: absolute; width: 280px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.5rem;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .vendor-card:nth-child(1) { top: 0; left: 20px; transform: rotate(-4deg); z-index: 1; opacity: 0.5; }
+  .vendor-card:nth-child(2) { top: 20px; left: 10px; transform: rotate(-2deg); z-index: 2; opacity: 0.75; }
+  .vendor-card:nth-child(3) { top: 40px; left: 0; transform: rotate(0); z-index: 3; opacity: 1; }
+  .vendor-card.animate-out {
+    transform: translateY(-80px) rotate(8deg) scale(0.9);
+    opacity: 0; z-index: 4;
+  }
+  .vc-badge {
+    display: inline-block; font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 1rem;
+  }
+  .vc-img {
+    width: 100%; height: 140px; border-radius: 10px;
+    object-fit: cover; margin-bottom: 1rem;
+    background: linear-gradient(135deg, #1e2d40 0%, #243447 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+  }
+  .vc-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+  .vc-meta { font-size: 0.8rem; color: var(--slate); margin-bottom: 1rem; }
+  .vc-footer {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .vc-rating { font-size: 0.8rem; color: var(--amber); }
+  .vc-delivery {
+    font-size: 0.75rem; color: var(--green); font-weight: 600;
+  }
+  /* Floating blobs */
+  .blob {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,158,11,0.12), transparent 70%);
+    pointer-events: none;
+  }
+  .blob-1 { width: 500px; height: 500px; top: -100px; right: -150px; }
+  .blob-2 { width: 300px; height: 300px; bottom: 50px; left: -80px; }
+
+  /* ── SECTION BASE ── */
+  section { padding: 6rem 7%; }
+  .section-eyebrow {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--amber);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 900; line-height: 1.1;
+    letter-spacing: -0.02em; margin-bottom: 1rem;
+  }
+  .section-sub {
+    color: var(--slate); font-size: 1rem; line-height: 1.7;
+    max-width: 480px;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how { background: var(--navy2); }
+  .how-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem;
+    margin-top: 4rem;
+  }
+  .how-step { position: relative; }
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem; font-weight: 900;
+    color: rgba(245,158,11,0.12); line-height: 1;
+    margin-bottom: -1rem; display: block;
+  }
+  .step-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: rgba(245,158,11,0.1);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1.25rem;
+  }
+  .step-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.6rem; }
+  .step-desc { color: var(--slate); font-size: 0.9rem; line-height: 1.7; }
+
+  /* ── CATEGORIES ── */
+  .cats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem; margin-top: 3rem;
+  }
+  .cat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem 1.25rem;
+    text-align: center; cursor: pointer; text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+    display: block;
+  }
+  .cat-card:hover {
+    border-color: var(--amber); background: rgba(245,158,11,0.05);
+    transform: translateY(-3px);
+  }
+  .cat-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
+  .cat-name { font-weight: 600; font-size: 0.9rem; color: var(--pearl); }
+  .cat-count { font-size: 0.75rem; color: var(--slate); margin-top: 3px; }
+
+  /* ── REVIEWS ── */
+  .reviews { background: var(--navy2); }
+  .reviews-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;
+  }
+  .reviews-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+  }
+  .review-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.75rem;
+  }
+  .review-stars { color: var(--amber); font-size: 0.9rem; margin-bottom: 1rem; letter-spacing: 2px; }
+  .review-text {
+    font-size: 0.9rem; line-height: 1.7; color: var(--pearl);
+    margin-bottom: 1.25rem; font-style: italic;
+  }
+  .review-text::before { content: '"'; font-size: 1.4rem; color: var(--amber); line-height: 0; vertical-align: -0.3em; margin-right: 2px; }
+  .review-author { display: flex; align-items: center; gap: 0.75rem; }
+  .review-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--amber), var(--amber2));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem; color: var(--navy); flex-shrink: 0;
+  }
+  .review-name { font-weight: 600; font-size: 0.88rem; }
+  .review-location { font-size: 0.75rem; color: var(--slate); }
+
+  /* ── NEWSLETTER ── */
+  .newsletter {
+    background: linear-gradient(135deg, #111827 0%, #0B1120 100%);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  .newsletter-inner { max-width: 560px; margin: 0 auto; }
+  .nl-icon {
+    width: 64px; height: 64px; border-radius: 16px;
+    background: rgba(245,158,11,0.1); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.75rem; margin: 0 auto 1.5rem;
+  }
+  .newsletter .section-title { margin-bottom: 0.75rem; }
+  .newsletter .section-sub { max-width: 100%; margin: 0 auto 2rem; }
+  .nl-form { display: flex; gap: 0.75rem; max-width: 460px; margin: 0 auto; }
+  .nl-input {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    color: var(--pearl); padding: 0.85rem 1.25rem;
+    border-radius: 8px; font-size: 0.9rem; font-family: inherit;
+    outline: none; transition: border-color 0.2s;
+  }
+  .nl-input::placeholder { color: var(--slate); }
+  .nl-input:focus { border-color: var(--amber); }
+  .nl-btn {
+    background: var(--amber); color: var(--navy);
+    border: none; padding: 0.85rem 1.5rem;
+    border-radius: 8px; font-weight: 700;
+    font-size: 0.9rem; cursor: pointer; white-space: nowrap;
+    font-family: inherit; transition: background 0.2s;
+  }
+  .nl-btn:hover { background: var(--amber2); }
+  .nl-note { font-size: 0.75rem; color: var(--slate); margin-top: 0.75rem; }
+
+  /* ── VENDORS MARQUEE ── */
+  .marquee-section { padding: 3rem 0; overflow: hidden; border-top: 1px solid var(--border); }
+  .marquee-label {
+    text-align: center; font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate);
+    margin-bottom: 2rem;
+  }
+  .marquee-track {
+    display: flex; gap: 2rem;
+    animation: marquee 28s linear infinite;
+    width: max-content;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+  .marquee-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.6rem 1.25rem;
+    font-size: 0.85rem; font-weight: 600; color: var(--slate);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── FEATURES ── */
+  .features { background: var(--navy); }
+  .features-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.5rem; margin-top: 3rem;
+  }
+  .feature-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 2rem;
+    transition: border-color 0.2s;
+  }
+  .feature-card:hover { border-color: rgba(245,158,11,0.35); }
+  .feature-card.large { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 10px;
+    background: rgba(245,158,11,0.1); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 1.25rem;
+  }
+  .feature-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem; }
+  .feature-desc { color: var(--slate); font-size: 0.88rem; line-height: 1.7; }
+  .feature-visual {
+    background: var(--navy); border-radius: 10px;
+    padding: 1.5rem; border: 1px solid var(--border);
+  }
+  .mini-map {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .map-dot {
+    height: 48px; border-radius: 8px;
+    background: rgba(245,158,11,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+  .map-dot.active { background: rgba(245,158,11,0.2); border: 1px solid var(--border); }
+
+  /* ── APP BANNER ── */
+  .app-banner {
+    background: linear-gradient(135deg, #141E2E 0%, #0B1120 100%);
+    border-top: 1px solid var(--border);
+  }
+  .app-inner {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4rem; align-items: center; max-width: 1000px; margin: 0 auto;
+  }
+  .app-badges { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+  .app-badge {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.7rem 1.25rem;
+    display: flex; align-items: center; gap: 0.75rem;
+    cursor: pointer; transition: border-color 0.2s;
+    text-decoration: none; color: var(--pearl);
+  }
+  .app-badge:hover { border-color: var(--amber); }
+  .badge-icon { font-size: 1.5rem; }
+  .badge-sub { font-size: 0.65rem; color: var(--slate); }
+  .badge-title { font-weight: 700; font-size: 0.9rem; }
+  .phone-mockup {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 32px; padding: 1.5rem;
+    max-width: 260px; margin: 0 auto;
+  }
+  .phone-screen {
+    background: var(--navy); border-radius: 20px;
+    padding: 1.25rem; overflow: hidden;
+  }
+  .phone-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1rem;
+  }
+  .phone-search {
+    background: var(--card); border-radius: 8px;
+    padding: 8px 12px; font-size: 0.75rem;
+    color: var(--slate); flex: 1; margin-right: 8px;
+  }
+  .phone-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pc-emoji { font-size: 1.5rem; }
+  .pc-name { font-size: 0.8rem; font-weight: 600; }
+  .pc-meta { font-size: 0.65rem; color: var(--slate); }
+  .pc-price { margin-left: auto; font-size: 0.8rem; font-weight: 700; color: var(--amber); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #070D1A; border-top: 1px solid var(--border);
+    padding: 4rem 7% 2rem;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem; margin-bottom: 3rem;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--amber); margin-bottom: 1rem;
+  }
+  .footer-logo span { color: var(--pearl); }
+  .footer-desc { color: var(--slate); font-size: 0.87rem; line-height: 1.7; max-width: 260px; }
+  .footer-col h4 { font-weight: 700; font-size: 0.85rem; margin-bottom: 1.25rem; color: var(--pearl); }
+  .footer-col a {
+    display: block; color: var(--slate); text-decoration: none;
+    font-size: 0.85rem; margin-bottom: 0.6rem;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--amber); }
+  .footer-bottom {
+    border-top: 1px solid var(--border); padding-top: 1.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-copy { color: var(--slate); font-size: 0.8rem; }
+  .footer-socials { display: flex; gap: 1rem; }
+  .social-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; cursor: pointer; text-decoration: none;
+    color: var(--slate); transition: border-color 0.2s, color 0.2s;
+  }
+  .social-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--green); color: #fff; padding: 0.85rem 1.5rem;
+    border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+    opacity: 0; transition: all 0.3s; z-index: 999; white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; min-height: auto; padding: 100px 5% 4rem; }
+    .hero-right { display: none; }
+    .how-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .reviews-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .feature-card.large { grid-column: span 1; grid-template-columns: 1fr; }
+    .app-inner { grid-template-columns: 1fr; text-align: center; }
+    .app-badges { justify-content: center; }
+    .phone-mockup { display: none; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+    .nav-mobile-btn { display: block; }
+  }
+  @media (max-width: 580px) {
+    section { padding: 4rem 5%; }
+    .hero { padding: 90px 5% 3rem; }
+    .hero-h1 { font-size: 2.4rem; }
+    .hero-stats { gap: 1.5rem; }
+    .nl-form { flex-direction: column; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+    .cats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, .marquee-track { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">BB<span>Store</span></div>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#categories">Categories</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#" class="nav-cta">Shop Now →</a>
+  </div>
+  <button class="nav-mobile-btn" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">Multi-vendor marketplace</div>
+    <h1 class="hero-h1">
+      Your city's<br>best vendors,
+      <em>at your door.</em>
+    </h1>
+    <p class="hero-sub">
+      Discover hundreds of local vendors — food, fashion, electronics, and more — all on one platform. Order once, delivered fast.
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">
+        Shop Now
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#how" class="btn-secondary">See how it works</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">500+</div>
+        <div class="stat-label">Active Vendors</div>
+      </div>
+      <div>
+        <div class="stat-num">12k+</div>
+        <div class="stat-label">Happy Customers</div>
+      </div>
+      <div>
+        <div class="stat-num">4.9★</div>
+        <div class="stat-label">Average Rating</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="card-stack" id="cardStack">
+      <div class="vendor-card">
+        <div class="vc-badge" style="background:rgba(16,185,129,0.15);color:#10B981;">⚡ Fast Delivery</div>
+        <div class="vc-img">🍕</div>
+        <div class="vc-name">Mama's Kitchen</div>
+        <div class="vc-meta">Nigerian cuisine · Ile-Ife</div>
+        <div class="vc-footer">
+          <div class="vc-rating">★★★★★ 4.9</div>
+          <div class="vc-delivery">Free delivery</div>
+        </div>
+      </div>
+      <div class="vendor-card">
+        <div class="vc-badge" style="background:rgba(245,158,11,0.15);color:#F59E0B;">🏆 Top Rated</div>
+        <div class="vc-img">👗</div>
+        <div class="vc-name">StyleHouse NG</div>
+        <div class="vc-meta">Fashion & Apparel · Osun</div>
+        <div class="vc-footer">
+          <div class="vc-rating">★★★★★ 4.8</div>
+          <div class="vc-delivery">₦500 delivery</div>
+        </div>
+      </div>
+      <div class="vendor-card">
+        <div class="vc-badge" style="background:rgba(99,102,241,0.15);color:#818CF8;">✨ New Vendor</div>
+        <div class="vc-img">📱</div>
+        <div class="vc-name">TechZone Ile-Ife</div>
+        <div class="vc-meta">Electronics & Gadgets · Ile-Ife</div>
+        <div class="vc-footer">
+          <div class="vc-rating">★★★★☆ 4.6</div>
+          <div class="vc-delivery">₦300 delivery</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-label">Trusted vendors across your city</div>
+  <div class="marquee-track" id="marqueeTrack">
+    <div class="marquee-item">🍔 Burgers & Grill</div>
+    <div class="marquee-item">👗 Fashion House</div>
+    <div class="marquee-item">📱 Electronics Pro</div>
+    <div class="marquee-item">🌿 Fresh Groceries</div>
+    <div class="marquee-item">💊 Health & Pharma</div>
+    <div class="marquee-item">📚 Books & Stationery</div>
+    <div class="marquee-item">🏠 Home & Décor</div>
+    <div class="marquee-item">🛠 Hardware & Tools</div>
+    <div class="marquee-item">🎁 Gifts & Crafts</div>
+    <div class="marquee-item">🍰 Bakeries</div>
+    <div class="marquee-item">💄 Beauty & Cosmetics</div>
+    <div class="marquee-item">🐾 Pet Supplies</div>
+    <!-- Duplicate for seamless loop -->
+    <div class="marquee-item">🍔 Burgers & Grill</div>
+    <div class="marquee-item">👗 Fashion House</div>
+    <div class="marquee-item">📱 Electronics Pro</div>
+    <div class="marquee-item">🌿 Fresh Groceries</div>
+    <div class="marquee-item">💊 Health & Pharma</div>
+    <div class="marquee-item">📚 Books & Stationery</div>
+    <div class="marquee-item">🏠 Home & Décor</div>
+    <div class="marquee-item">🛠 Hardware & Tools</div>
+    <div class="marquee-item">🎁 Gifts & Crafts</div>
+    <div class="marquee-item">🍰 Bakeries</div>
+    <div class="marquee-item">💄 Beauty & Cosmetics</div>
+    <div class="marquee-item">🐾 Pet Supplies</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-eyebrow">Simple process</div>
+  <div class="section-title">From browse to door<br>in three steps</div>
+  <div class="how-grid">
+    <div class="how-step">
+      <span class="step-num">01</span>
+      <div class="step-icon">📍</div>
+      <div class="step-title">Set your location</div>
+      <p class="step-desc">Enable location or enter your city to instantly discover vendors and products available near you.</p>
+    </div>
+    <div class="how-step">
+      <span class="step-num">02</span>
+      <div class="step-icon">🛒</div>
+      <div class="step-title">Browse & add to cart</div>
+      <p class="step-desc">Explore thousands of products from multiple vendors. Mix and match from different shops in a single order.</p>
+    </div>
+    <div class="how-step">
+      <span class="step-num">03</span>
+      <div class="step-icon">🚚</div>
+      <div class="step-title">Track your delivery</div>
+      <p class="step-desc">Pay securely and follow your order in real time. Our delivery agents bring it straight to your door.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section id="categories">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:0">
+    <div>
+      <div class="section-eyebrow">Shop by category</div>
+      <div class="section-title">Everything you<br>need, one place</div>
+    </div>
+    <a href="#" class="btn-secondary" style="margin-bottom:0.5rem">View all categories →</a>
+  </div>
+  <div class="cats-grid">
+    <a href="#" class="cat-card"><span class="cat-icon">🍔</span><div class="cat-name">Food & Drinks</div><div class="cat-count">124 vendors</div></a>
+    <a href="#" class="cat-card"><span class="cat-icon">👗</span><div class="cat-name">Fashion</div><div class="cat-count">89 vendors</div></a>
+    <a href="#" class="cat-card"><span class="cat-icon">📱</span><div class="cat-name">Electronics</div><div class="cat-count">56 vendors</div></a>
+    <a href="#" class="cat-card"><span class="cat-icon">🌿</span><div class="cat-name">Groceries</div><div class="cat-count">78 vendors</div></a>
+    <a href="#" class="cat-card"><span class="cat-icon">💊</span><div class="cat-name">Pharmacy</div><div class="cat-count">34 vendors</div></a>
+    <a href="#" class="cat-card"><span class="cat-icon">🏠</span><div class="cat-name">Home & Living</div><div class="cat-count">67 vendors</div></a>
+    <a href="#" class="cat-card"><span class="cat-icon">💄</span><div class="cat-name">Beauty</div><div class="cat-count">91 vendors</div></a>
+    <a href="#" class="cat-card"><span class="cat-icon">📚</span><div class="cat-name">Books</div><div class="cat-count">29 vendors</div></a>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-eyebrow">Why BBStore</div>
+  <div class="section-title">Built for how you<br>actually shop</div>
+  <div class="features-grid">
+    <div class="feature-card large">
+      <div>
+        <div class="feature-icon">🗺</div>
+        <div class="feature-title">Location-first discovery</div>
+        <p class="feature-desc">We only show you vendors that actually deliver to your area. No frustrating "out of range" messages after you've already filled your cart. Set your city once, shop everything within reach.</p>
+        <a href="#" class="btn-secondary" style="margin-top:1.5rem;font-size:0.85rem;padding:0.65rem 1.25rem">Explore vendors →</a>
+      </div>
+      <div class="feature-visual">
+        <div class="mini-map">
+          <div class="map-dot">🏪</div>
+          <div class="map-dot active">📍</div>
+          <div class="map-dot">🍕</div>
+          <div class="map-dot active">👗</div>
+          <div class="map-dot">🚚</div>
+          <div class="map-dot">📱</div>
+          <div class="map-dot">🌿</div>
+          <div class="map-dot active">⭐</div>
+          <div class="map-dot">🏠</div>
+        </div>
+        <p style="text-align:center;font-size:0.75rem;color:var(--slate);margin-top:1rem">Vendors near you · Ile-Ife, Osun</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">Secure payments</div>
+      <p class="feature-desc">Pay with Paystack or card. Every transaction is encrypted and protected. No card details stored on our servers.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Real-time tracking</div>
+      <p class="feature-desc">Watch your order move from vendor to your door. Know exactly when your delivery agent is 5 minutes away.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏪</div>
+      <div class="feature-title">Sell on BBStore</div>
+      <p class="feature-desc">Join hundreds of vendors already growing their business. Set up your store in minutes, no tech skills needed.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⭐</div>
+      <div class="feature-title">Verified reviews</div>
+      <p class="feature-desc">Every review comes from a real, verified purchase. Know what you're getting before you order.</p>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews" id="reviews">
+  <div class="reviews-header">
+    <div>
+      <div class="section-eyebrow">Customer stories</div>
+      <div class="section-title">What Ile-Ife<br>is saying</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;color:var(--amber)">4.9</div>
+      <div style="color:var(--amber);letter-spacing:3px;font-size:0.9rem">★★★★★</div>
+      <div style="font-size:0.8rem;color:var(--slate);margin-top:4px">from 2,400+ reviews</div>
+    </div>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">I ordered jollof rice from three different vendors at once. Everything arrived together, still hot. This is actually the future.</p>
+      <div class="review-author">
+        <div class="review-avatar">AO</div>
+        <div>
+          <div class="review-name">Adesola O.</div>
+          <div class="review-location">Ile-Ife, Osun</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">As a vendor, I went from 10 orders a week to over 80 in my first month. The exposure BBStore gives you is unmatched.</p>
+      <div class="review-author">
+        <div class="review-avatar">KA</div>
+        <div>
+          <div class="review-name">Kunle A. — Vendor</div>
+          <div class="review-location">StyleHouse NG, Osun</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">Tracking was live the whole time. I watched the delivery agent's route on my phone. Delivery arrived in 22 minutes. Wild.</p>
+      <div class="review-author">
+        <div class="review-avatar">TF</div>
+        <div>
+          <div class="review-name">Tolu F.</div>
+          <div class="review-location">Ile-Ife, Osun</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter">
+  <div class="newsletter-inner">
+    <div class="nl-icon">📬</div>
+    <div class="section-title">Get deals before<br>anyone else</div>
+    <p class="section-sub">Flash sales, new vendor launches, and exclusive discounts — straight to your inbox. No spam, unsubscribe any time.</p>
+    <form class="nl-form" onsubmit="handleNewsletter(event)">
+      <input class="nl-input" type="email" placeholder="your@email.com" required>
+      <button class="nl-btn" type="submit">Subscribe</button>
+    </form>
+    <p class="nl-note">Join 8,000+ subscribers. No spam. Cancel anytime.</p>
+  </div>
+</section>
+
+<!-- APP BANNER -->
+<section class="app-banner">
+  <div class="app-inner">
+    <div>
+      <div class="section-eyebrow">Mobile app</div>
+      <div class="section-title" style="font-size:clamp(1.8rem,3vw,2.5rem)">Shop on the go,<br>anywhere you are</div>
+      <p class="section-sub" style="margin-top:0.75rem">The BBStore app puts every local vendor in your pocket. Browse, order, and track — all from your phone.</p>
+      <div class="app-badges">
+        <a href="#" class="app-badge">
+          <span class="badge-icon">🍎</span>
+          <div>
+            <div class="badge-sub">Download on the</div>
+            <div class="badge-title">App Store</div>
+          </div>
+        </a>
+        <a href="#" class="app-badge">
+          <span class="badge-icon">▶</span>
+          <div>
+            <div class="badge-sub">Get it on</div>
+            <div class="badge-title">Google Play</div>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="phone-mockup">
+      <div class="phone-screen">
+        <div class="phone-row">
+          <div class="phone-search">Search products…</div>
+          <div style="font-size:1.2rem">🛒</div>
+        </div>
+        <div class="phone-card">
+          <div class="pc-emoji">🍕</div>
+          <div>
+            <div class="pc-name">Pepperoni Pizza</div>
+            <div class="pc-meta">Mama's Kitchen</div>
+          </div>
+          <div class="pc-price">₦4,500</div>
+        </div>
+        <div class="phone-card">
+          <div class="pc-emoji">👗</div>
+          <div>
+            <div class="pc-name">Ankara Dress</div>
+            <div class="pc-meta">StyleHouse NG</div>
+          </div>
+          <div class="pc-price">₦12,000</div>
+        </div>
+        <div class="phone-card">
+          <div class="pc-emoji">📱</div>
+          <div>
+            <div class="pc-name">Earbuds Pro</div>
+            <div class="pc-meta">TechZone</div>
+          </div>
+          <div class="pc-price">₦18,500</div>
+        </div>
+        <div style="text-align:center;margin-top:10px">
+          <div style="display:inline-block;background:var(--amber);color:var(--navy);font-size:0.75rem;font-weight:700;padding:8px 20px;border-radius:6px;">Checkout · ₦35,000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">BB<span>Store</span></div>
+      <p class="footer-desc">Connecting you to the best local vendors in your city. Fast delivery, secure payments, real reviews.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <a href="#">All Products</a>
+      <a href="#">Flash Deals</a>
+      <a href="#">New Arrivals</a>
+      <a href="#">Categories</a>
+    </div>
+    <div class="footer-col">
+      <h4>Vendors</h4>
+      <a href="#">Start Selling</a>
+      <a href="#">Pricing Plans</a>
+      <a href="#">Vendor Dashboard</a>
+      <a href="#">Field Agents</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="#">Help Center</a>
+      <a href="#">Track Order</a>
+      <a href="#">Contact Us</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 BBStore. All rights reserved. Made with ♥ in Ile-Ife, Osun.</p>
+    <div class="footer-socials">
+      <a href="#" class="social-btn" title="Twitter">𝕏</a>
+      <a href="#" class="social-btn" title="Instagram">📷</a>
+      <a href="#" class="social-btn" title="WhatsApp">💬</a>
+      <a href="#" class="social-btn" title="Facebook">f</a>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">✓ You're on the list! Check your inbox.</div>
+
+<script>
+  // Card stack shuffle
+  const stack = document.getElementById('cardStack');
+  if (stack) {
+    const cards = stack.querySelectorAll('.vendor-card');
+    let current = 0;
+    setInterval(() => {
+      const bottom = cards[0];
+      bottom.classList.add('animate-out');
+      setTimeout(() => {
+        bottom.classList.remove('animate-out');
+        stack.appendChild(bottom);
+        // re-query and reset z-index/opacity
+        const all = stack.querySelectorAll('.vendor-card');
+        all[0].style.cssText = 'top:0;left:20px;transform:rotate(-4deg);z-index:1;opacity:0.5;';
+        all[1].style.cssText = 'top:20px;left:10px;transform:rotate(-2deg);z-index:2;opacity:0.75;';
+        all[2].style.cssText = 'top:40px;left:0;transform:rotate(0);z-index:3;opacity:1;';
+      }, 500);
+    }, 3000);
+  }
+
+  // Newsletter toast
+  function handleNewsletter(e) {
+    e.preventDefault();
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    e.target.reset();
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.how-step, .cat-card, .review-card, .feature-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
