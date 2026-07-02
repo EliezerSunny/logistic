@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBStore — Launching Soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --amber:  #F59E0B;
+    --amber2: #D97706;
+    --pearl:  #F8F6F1;
+    --slate:  #94A3B8;
+    --green:  #10B981;
+    --dark:   rgba(7, 10, 20, 0.82);
+    --border: rgba(245,158,11,0.2);
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--pearl);
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Full-bleed cinematic background */
+  .bg-layer {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      linear-gradient(to bottom, rgba(7,10,20,0.75) 0%, rgba(7,10,20,0.55) 40%, rgba(7,10,20,0.85) 100%),
+      /* Atmospheric dark market/city image feel using CSS */
+      radial-gradient(ellipse 120% 60% at 50% 100%, #1a0a00 0%, transparent 60%),
+      radial-gradient(ellipse 80% 80% at 80% 20%, rgba(245,158,11,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 20% 70%, rgba(16,185,129,0.04) 0%, transparent 50%),
+      linear-gradient(160deg, #07080F 0%, #0d1520 40%, #111020 70%, #090810 100%);
+  }
+
+  /* Animated particles */
+  .particles {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute; border-radius: 50%;
+    background: var(--amber); opacity: 0;
+    animation: float-up linear infinite;
+  }
+  @keyframes float-up {
+    0%   { transform: translateY(110vh) scale(1); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.2; }
+    100% { transform: translateY(-10vh) scale(0.3); opacity: 0; }
+  }
+
+  /* Grid lines overlay */
+  .grid-overlay {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  /* Main layout */
+  .page {
+    position: relative; z-index: 10;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  /* Logo */
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem; font-weight: 900;
+    color: var(--amber); letter-spacing: -0.02em;
+    margin-bottom: 3.5rem;
+    position: relative;
+  }
+  .logo span { color: var(--pearl); }
+  .logo::after {
+    content: '';
+    display: block; width: 2px; height: 40px;
+    background: linear-gradient(to bottom, var(--amber), transparent);
+    margin: 1rem auto 0;
+  }
+
+  /* Eyebrow */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--amber);
+    margin-bottom: 1.5rem;
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: rgba(245,158,11,0.06);
+  }
+  .eyebrow-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--amber);
+    animation: pulse-dot 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.6); opacity: 0.5; }
+  }
+
+  /* Headline */
+  .headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 7vw, 6rem);
+    font-weight: 900; line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.25rem;
+    max-width: 800px;
+  }
+  .headline em {
+    font-style: italic; color: var(--amber); display: block;
+  }
+
+  .subline {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: var(--slate); line-height: 1.7;
+    max-width: 480px; margin: 0 auto 3.5rem;
+  }
+
+  /* ── COUNTDOWN ── */
+  .countdown {
+    display: flex; gap: clamp(1rem, 3vw, 2.5rem);
+    align-items: center; margin-bottom: 3.5rem;
+  }
+  .time-block { text-align: center; }
+  .time-num {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    font-weight: 900; line-height: 1;
+    color: var(--pearl);
+    display: block;
+    /* Subtle glow on digits */
+    text-shadow: 0 0 40px rgba(245,158,11,0.2);
+    transition: color 0.15s;
+    min-width: clamp(80px, 15vw, 160px);
+  }
+  .time-num.tick { color: var(--amber); }
+  .time-label {
+    font-size: clamp(0.65rem, 1.5vw, 0.78rem);
+    font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--slate);
+    margin-top: 0.5rem;
+  }
+  .time-sep {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    color: rgba(245,158,11,0.3);
+    line-height: 1; padding-bottom: 1.5rem;
+    animation: blink 1.2s step-end infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  /* Thin line under countdown */
+  .countdown-line {
+    width: 100%; max-width: 500px;
+    height: 1px; background: linear-gradient(90deg, transparent, var(--border), var(--amber), var(--border), transparent);
+    margin: 0 auto 3.5rem;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    width: 100%; max-width: 420px; margin: 0 auto 3.5rem;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 0.75rem; color: var(--slate);
+    margin-bottom: 0.6rem;
+  }
+  .progress-bar {
+    height: 4px; background: rgba(255,255,255,0.08);
+    border-radius: 4px; position: relative; overflow: visible;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--amber2), var(--amber));
+    border-radius: 4px;
+    animation: glow-bar 2.5s ease-in-out infinite alternate;
+  }
+  
+  /* Delivery Car CSS placement */
+  .delivery-car {
+    position: absolute;
+    top: -24px; 
+    left: 0%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 24px;
+    pointer-events: none;
+    transition: left 0.2s ease-out;
+  }
+  .delivery-car svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 2px 6px rgba(245,158,11,0.6));
+    animation: engine-vibration 0.15s linear infinite;
+  }
+
+  @keyframes engine-vibration {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1px); }
+  }
+
+  @keyframes glow-bar {
+    from { box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+    to   { box-shadow: 0 0 16px rgba(245,158,11,0.7); }
+  }
+
+  /* Notify form */
+  .notify-form {
+    display: flex; gap: 0.75rem; max-width: 440px;
+    margin: 0 auto 1.25rem; width: 100%;
+  }
+  .notify-input {
+    flex: 1; background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(245,158,11,0.2);
+    color: var(--pearl); padding: 0.9rem 1.25rem;
+    border-radius: 8px; font-size: 0.9rem; font-family: inherit;
+    outline: none; transition: border-color 0.2s;
+    backdrop-filter: blur(8px);
+  }
+  .notify-input::placeholder { color: var(--slate); }
+  .notify-input:focus { border-color: var(--amber); }
+  .notify-btn {
+    background: var(--amber); color: #07080F;
+    border: none; padding: 0.9rem 1.5rem;
+    border-radius: 8px; font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .notify-btn:hover { background: var(--amber2); transform: translateY(-1px); }
+  .notify-note { font-size: 0.75rem; color: var(--slate); margin-bottom: 3.5rem; }
+
+  /* Social proof */
+  .social-proof {
+    display: flex; align-items: center; gap: 0.75rem;
+    justify-content: center;
+  }
+  .avatars { display: flex; }
+  .av {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid #07080F;
+    background: linear-gradient(135deg, var(--amber), var(--amber2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: #07080F;
+    margin-left: -8px;
+  }
+  .av:first-child { margin-left: 0; }
+  .sp-text { font-size: 0.8rem; color: var(--slate); }
+  .sp-text strong { color: var(--pearl); }
+
+  /* Bottom nav */
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 5%;
+    background: rgba(7,10,20,0.9);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+  }
+  .bottom-links { display: flex; gap: 1.5rem; }
+  .bottom-links a {
+    color: var(--slate); text-decoration: none;
+    font-size: 0.8rem; transition: color 0.2s;
+  }
+  .bottom-links a:hover { color: var(--amber); }
+  .bottom-copy { font-size: 0.75rem; color: var(--slate); }
+
+  /* Launched state */
+  .success-msg {
+    display: none;
+    background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 10px; padding: 1rem 1.5rem;
+    color: var(--green); font-size: 0.9rem; font-weight: 600;
+    margin-bottom: 2rem; max-width: 440px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--green); color: #fff; padding: 0.85rem 1.5rem;
+    border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+    opacity: 0; transition: all 0.3s; z-index: 999; white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .countdown { gap: 0.75rem; }
+    .time-sep { display: none; }
+    .notify-form { flex-direction: column; }
+    .bottom-bar { flex-direction: column; gap: 0.5rem; text-align: center; }
+    .bottom-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grid-overlay"></div>
+<div class="particles" id="particles"></div>
+
+<div class="page">
+
+  <div class="logo">BB<span>Store</span></div>
+
+  <div class="eyebrow">
+    <span class="eyebrow-dot"></span>
+    Something big is coming
+  </div>
+
+  <h1 class="headline">
+    Every vendor.<br>
+    One city.
+    <em>Your door.</em>
+  </h1>
+
+  <p class="subline">
+    BBStore launches soon — the multi-vendor marketplace built for Ile-Ife and beyond. Hundreds of local vendors, one seamless checkout.
+  </p>
+
+  <div class="countdown" id="countdown">
+    <div class="time-block">
+      <span class="time-num" id="days">00</span>
+      <div class="time-label">Days</div>
+    </div>
+    <div class="time-sep">:</div>
+    <div class="time-block">
+      <span class="time-num" id="hours">00</span>
+      <div class="time-label">Hours</div>
+    </div>
+    <div class="time-sep">:</div>
+    <div class="time-block">
+      <span class="time-num" id="minutes">00</span>
+      <div class="time-label">Minutes</div>
+    </div>
+    <div class="time-sep">:</div>
+    <div class="time-block">
+      <span class="time-num" id="seconds">00</span>
+      <div class="time-label">Seconds</div>
+    </div>
+  </div>
+
+  <div class="countdown-line"></div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Time to launch</span>
+      <span style="color:var(--amber);font-weight:600" id="progressPct">0% elapsed</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+      <div class="delivery-car" id="deliveryCar">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 6H3C1.89543 6 1 6.89543 1 8V15C1 16.1046 1.89543 17 3 17H4.18055C4.6014 18.1633 5.70457 19 7 19C8.29543 19 9.3986 18.1633 9.81945 17H14.1806C14.6014 18.1633 15.7046 19 17 19C18.2954 19 19.3986 18.1633 19.8194 17H21C22.1046 17 23 16.1046 23 15V11L19 6H15Z" fill="#F59E0B"/>
+          <path d="M19 7L21.6 10.25C21.85 10.55 22 10.95 22 11.35V13H15V7H19Z" fill="#D97706"/>
+          <circle cx="7" cy="17" r="2" fill="#07080F" stroke="#F59E0B" stroke-width="2"/>
+          <circle cx="17" cy="17" r="2" fill="#07080F" stroke="#F59E0B" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-msg" id="successMsg">
+    ✓ You're on the early access list! We'll email you the moment we launch.
+  </div>
+
+  <form class="notify-form" onsubmit="handleNotify(event)">
+    <input class="notify-input" type="email" placeholder="Enter your email for early access" required>
+    <button class="notify-btn" type="submit">Notify Me</button>
+  </form>
+  <p class="notify-note">Be first to shop. No spam. Unsubscribe any time.</p>
+
+  <div class="social-proof">
+    <div class="avatars">
+      <div class="av">AO</div>
+      <div class="av">KF</div>
+      <div class="av">TB</div>
+      <div class="av">RA</div>
+      <div class="av">+</div>
+    </div>
+    <p class="sp-text"><strong>2,400+ people</strong> already on the early access list</p>
+  </div>
+
+</div>
+
+<div class="bottom-bar">
+  <div class="bottom-links">
+    <a href="landing.html">← Landing Page</a>
+    <a href="#">Privacy</a>
+    <a href="#">Contact</a>
+  </div>
+  <p class="bottom-copy">© 2025 BBStore · Ile-Ife, Osun, Nigeria</p>
+</div>
+
+<div class="toast" id="toast">🎉 You're on the list! See you at launch.</div>
+
+<script>
+  // ── Configure these two dates ──
+  const START  = new Date('2026-06-01T00:00:00').getTime(); // project start date
+  const LAUNCH = new Date('2026-08-01T00:00:00').getTime(); // launch date
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function updateProgress() {
+    const now      = Date.now();
+    const total    = LAUNCH - START;          // full project duration
+    const elapsed  = Math.min(now - START, total); // how far we are
+    const pct      = Math.max(0, Math.min(100, Math.round((elapsed / total) * 100)));
+
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('deliveryCar').style.left   = pct + '%';
+    document.getElementById('progressPct').textContent  = pct + '% elapsed';
+  }
+
+  function tick() {
+    const now  = Date.now();
+    const diff = LAUNCH - now;
+
+    if (diff <= 0) {
+      document.getElementById('days').textContent    = '00';
+      document.getElementById('hours').textContent   = '00';
+      document.getElementById('minutes').textContent = '00';
+      document.getElementById('seconds').textContent = '00';
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('deliveryCar').style.left   = '100%';
+      document.getElementById('progressPct').textContent  = '100% — Were live!';
+      return;
+    }
+
+    const d  = Math.floor(diff / 86400000);
+    const h  = Math.floor((diff % 86400000) / 3600000);
+    const m  = Math.floor((diff % 3600000) / 60000);
+    const s  = Math.floor((diff % 60000) / 1000);
+
+    const setNum = (id, val) => {
+      const el = document.getElementById(id);
+      const v  = pad(val);
+      if (el.textContent !== v) {
+        el.textContent = v;
+        el.classList.add('tick');
+        setTimeout(() => el.classList.remove('tick'), 150);
+      }
+    };
+
+    setNum('days',    d);
+    setNum('hours',   h);
+    setNum('minutes', m);
+    setNum('seconds', s);
+
+    updateProgress();
+  }
+
+  tick();
+  setInterval(tick, 1000);
+
+  // Newsletter
+  function handleNotify(e) {
+    e.preventDefault();
+    const form = e.target;
+    form.style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  // Floating particles
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random() * 100}%;
+      animation-duration:${8 + Math.random() * 14}s;
+      animation-delay:${Math.random() * 12}s;
+      opacity:0;
+    `;
+    container.appendChild(p);
+  }
+</script>
+</body>
+</html>
